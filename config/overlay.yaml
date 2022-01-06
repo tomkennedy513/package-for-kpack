@@ -1,0 +1,83 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:overlay", "overlay")
+
+#@overlay/match by=overlay.subset({"metadata":{"name":"kpack-controller"}, "kind": "Deployment"})
+---
+spec:
+  template:
+    spec:
+      #@overlay/match missing_ok=True
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        #@overlay/match by="name"
+        - name: controller
+          #@overlay/match missing_ok=True
+          securityContext:
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            #@overlay/append
+            - name: CREDENTIAL_PROVIDER_SECRET_PATH
+              value: /var/kpack/credentials
+            #@ if data.values.http_proxy != None:
+            #@overlay/append
+            - name: HTTP_PROXY
+              value: #@ data.values.http_proxy
+            #@ end
+            #@ if data.values.https_proxy != None:
+            #@overlay/append
+            - name: HTTPS_PROXY
+              value: #@ data.values.https_proxy
+            #@ end
+            #@ if data.values.no_proxy != None:
+            #@overlay/append
+            - name: NO_PROXY
+              value: #@ data.values.no_proxy
+          #@ end
+          #@overlay/match missing_ok=True
+          volumeMounts:
+            - name: credentials
+              mountPath: /var/kpack/credentials
+              readOnly: true
+      #@overlay/match missing_ok=True
+      volumes:
+        - name: credentials
+          secret:
+            secretName:  kp-default-repository-secret
+
+#@overlay/match by=overlay.subset({"metadata":{"name":"kpack-webhook"}, "kind": "Deployment"})
+---
+spec:
+  template:
+    spec:
+      #@overlay/match missing_ok=True
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        #@overlay/match by="name"
+        - name: webhook
+          #@overlay/match missing_ok=True
+          securityContext:
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+
+#@overlay/match by=overlay.subset({"kind": "ClusterRoleBinding"}), expects="1+"
+---
+metadata:
+  #@overlay/match missing_ok=True
+  annotations:
+    kapp.k14s.io/update-strategy: fallback-on-replace
+
+#@overlay/match by=overlay.subset({"kind": "RoleBinding"}), expects="1+"
+---
+metadata:
+  #@overlay/match missing_ok=True
+  annotations:
+    kapp.k14s.io/update-strategy: fallback-on-replace
