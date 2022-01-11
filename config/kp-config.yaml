@@ -1,5 +1,5 @@
 #@ load("@ytt:data", "data")
-#@ load("/values.star", "kp_default_docker_configjson")
+#@ load("values.star", "kp_default_docker_configjson")
 ---
 apiVersion: v1
 kind: ConfigMap
