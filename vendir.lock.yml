@@ -4,5 +4,5 @@ directories:
   - githubRelease:
       url: https://api.github.com/repos/pivotal/kpack/releases/55222486
     path: .
-  path: config/kpack/upstream
+  path: config/upstream
 kind: LockConfig

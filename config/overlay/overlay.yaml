@@ -23,17 +23,17 @@ spec:
             #@overlay/append
             - name: CREDENTIAL_PROVIDER_SECRET_PATH
               value: /var/kpack/credentials
-            #@ if data.values.http_proxy != None:
+            #@ if data.values.http_proxy != "":
             #@overlay/append
             - name: HTTP_PROXY
               value: #@ data.values.http_proxy
             #@ end
-            #@ if data.values.https_proxy != None:
+            #@ if data.values.https_proxy != "":
             #@overlay/append
             - name: HTTPS_PROXY
               value: #@ data.values.https_proxy
             #@ end
-            #@ if data.values.no_proxy != None:
+            #@ if data.values.no_proxy != "":
             #@overlay/append
             - name: NO_PROXY
               value: #@ data.values.no_proxy
