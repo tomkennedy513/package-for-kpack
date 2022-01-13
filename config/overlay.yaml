@@ -37,17 +37,33 @@ spec:
             #@overlay/append
             - name: NO_PROXY
               value: #@ data.values.no_proxy
-          #@ end
+            #@ end
+            #@ if data.values.ca_cert_data != "":
+            #@overlay/append
+            - name: SERVICE_BINDING_ROOT
+              value: "/bindings"
+            #@ end
           #@overlay/match missing_ok=True
           volumeMounts:
             - name: credentials
               mountPath: /var/kpack/credentials
               readOnly: true
+          #@ if data.values.ca_cert_data != "":
+          #@overlay/append
+            - mountPath: /bindings/ca-cert
+              name: ca-cert-data
+          #@ end
       #@overlay/match missing_ok=True
       volumes:
         - name: credentials
           secret:
             secretName:  kp-default-repository-secret
+      #@ if data.values.ca_cert_data != "":
+      #@overlay/append
+        - name: ca-cert-data
+          secret:
+            secretName: ca-cert-data
+      #@ end
 
 #@overlay/match by=overlay.subset({"metadata":{"name":"kpack-webhook"}, "kind": "Deployment"})
 ---
