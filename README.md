@@ -1,2 +1,2 @@
 
-# carvel-package-kpack
+# package-kpack
