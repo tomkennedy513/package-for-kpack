@@ -20,5 +20,4 @@ pushd "$dir/.."
   sed -i '' "s/constraints: \"[0-9]*\.[0-9]*\.[0-9]*\"/constraints: \"$version\"/g" "vendir.yml"
 
   vendir sync
-  go mod tidy
 popd
